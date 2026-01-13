@@ -29,6 +29,30 @@ app.get("/", (req, res) => {
 });
 
 // your code here!
+app.get("/topRankings", async (req, res) => {
+  try {
+    let limit = parseInt(req.query.limit, 10);
+    let offset = parseInt(req.query.offset, 10);
+
+    // defaults
+    if (isNaN(limit)) limit = onePageArticleCount; // 20
+    if (isNaN(offset)) offset = 0;
+
+    // prevent negative values
+    if (limit < 0) limit = onePageArticleCount;
+    if (offset < 0) offset = 0;
+
+    const result = await Leaderboard.find({})
+      .skip(offset)
+      .limit(limit)
+      .lean();
+
+    return res.status(200).json(result);
+  } catch (err) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 
 // ==end==
 
